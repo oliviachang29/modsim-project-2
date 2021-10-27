@@ -17,4 +17,3 @@ function heater_state = get_heater_state(temp, set_temp, heater_state)
     end
 end
 
- 
