@@ -1,0 +1,30 @@
+function [T, M] = house_simulation()
+    % set parameters (at some point move this into function arguments)
+    time_gone = 10; % hours
+    thermal_mass = 0; % TODO: set value
+    specific_heat_house = 0; % TODO: set value
+    environment_temp = 0; % TODO: create function to get current envi
+    
+    % initial stock values
+    U_0 = temperatureToEnergy(initial_house_temp, thermal_mass, specific_heat_house);
+        
+    t_0 = 0;
+    t_end = time_gone * 60 * 60; % seconds
+    
+    [T, U] = ode45(@rate_func, [t_0, t_end], U_0);
+    M = % something;
+    
+    function res = rate_func(t, U_i)
+        % dUdt = conduction flow out = - dQ/dt
+        % conduction flow out: -kA * delta T / d
+        % convection flow out: - h A * delta T
+         
+        current_temp = energyToTemperature(U_i, thermal_mass, specific_heat_house);
+        delta_T = current_temp - environment_temp; % T(coffee) - T(environment);
+        dQdt = delta_T / R_thermal;
+                
+        dUdt = -dQdt;
+        res = [dUdt];
+    end
+end
+
