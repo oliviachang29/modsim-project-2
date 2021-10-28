@@ -11,6 +11,7 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     d = 0.2; %m
     k = 0.5; %W/m
     m = A * d * 2300;  %using 2300 as density
+   
     c = 1000; %for concreat
     H = 15000; %Watts
     
