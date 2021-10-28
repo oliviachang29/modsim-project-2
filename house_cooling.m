@@ -1,45 +1,70 @@
-function [time, TEMP] = house_cooling()
+function [time_range, temperature, energy_consumption, on_time] = house_cooling()
 
+    %initial conditions
     set_temp = 293;
-    
     temp_amb = 270;
     heater_state = true;
+    t_cur = 290;
     
-    temp = 290;
-    A = 6 * 10^2;  %m^2
-    d = 0.25; %m
-    k = 0.005; %W/m
-    
+    %hosue paramters
+    A = 6 * 5^2;  %m^2
+    d = 0.2; %m
+    k = 0.5; %W/m
     m = A * d * 2300;  %using 2300 as density
     c = 1000; %for concreat
     H = 15000; %Watts
     
-    U_0 = c*m*temp;
+    U_0 = c*m*t_cur;
     
+    %ODE45 did not work...
+    %[time, energy] = ode45(@rate, [0:0.01:(6*60*60)], U_0);
     
-    %[time, energy] = ode45(@rate, [0:(200*60*60)], U_0);
-  
+    %setup for Eulers method
+    start_time = 1;
+    end_time = 60*60*24;
+    dt = 1;
+    time_range = start_time:dt:end_time;
     
-    %for i=1:10:200*60*60
-        
+    %make empty array
+    energy = zeros(1, length(time_range));
+    energy_consumption = zeros(1, length(time_range));
+    on_time = 0;
     
-    TEMP = energyToTemperature(energy, m, c);
+    %populate with initial condition
+    energy(1) = U_0;
+    energy_consumption(1) = (1*H*dt);
     
-    figure(1)
-    clf
-    plot(time / (60*60), TEMP)
-
-
-    function [dUdt] = rate(t, U)
-        temp = energyToTemperature(U, m, c);
-        %heater_state = get_heater_state(temp, set_temp, heater_state);
-        if temp > set_temp
-            heater_state = false;
-        else
-            heater_state = true;
+    %Eulers method
+    for t=2:length(time_range)
+        [dUdt, dHdt] = rate(0, energy(t-1));
+        energy(t) = energy(t-1) + (dt * dUdt);
+        energy_consumption(t) = energy_consumption(t-1) + (dt * dHdt);
+        if dHdt > 0
+            on_time = on_time + dt;
         end
+    end
+   
+    %convert to energy
+    temperature = energyToTemperature(energy, m, c);
+    
+
+    
+    %rate function
+    function [dUdt, dHdt] = rate(~, U)
+        %calculate curret temp
+        t_cur = energyToTemperature(U, m, c);
+        
+        %find curret heater statues
+        heater_state = get_heater_state(t_cur, set_temp, heater_state);
+
+        %computute conduction R value
         R_tot = (d / (A*k));
         
-        [dUdt] = (H*heater_state) - ((temp - temp_amb) / R_tot);
+        %put it all together
+        
+        dHdt = (heater_state * H);
+        dUdt = dHdt - ((t_cur - temp_amb) / R_tot);
+        
+        
     end
 end

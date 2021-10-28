@@ -1,5 +1,5 @@
 function heater_state = get_heater_state(temp, set_temp, heater_state)
-    buffer = 1;
+    buffer = 0.5;
     %thermostat logic
     %if heater is off and house is colder than minimum tolerance...
     if temp < (set_temp - buffer)
