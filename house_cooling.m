@@ -1,19 +1,19 @@
-function [time_range, temperature, energy_consumption, on_time] = house_cooling()
+function [time_range, temperature, energy_consumption, on_time] = house_cooling(set_temp_range)
 
     %initial conditions
-    set_temp = 293;
-    temp_amb = 270;
+    set_temp = set_temp_range(1);
+    temp_amb = 285;
     heater_state = true;
-    t_cur = 290;
+    t_cur = temp_amb;
     
     %hosue paramters
     A = 6 * 5^2;  %m^2
     d = 0.2; %m
-    k = 0.5; %W/m
+    k = 1.3; %W/m
     m = A * d * 2300;  %using 2300 as density
    
     c = 1000; %for concreat
-    H = 15000; %Watts
+    H = 100000; %Watts
     
     U_0 = c*m*t_cur;
     
@@ -22,7 +22,7 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     
     %setup for Eulers method
     start_time = 1;
-    end_time = 60*60*24;
+    end_time = length(set_temp_range);
     dt = 1;
     time_range = start_time:dt:end_time;
     
@@ -36,7 +36,8 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     energy_consumption(1) = (1*H*dt);
     
     %Eulers method
-    for t=2:length(time_range)
+    for t=2:length(set_temp_range)
+        set_temp = set_temp_range(t);
         [dUdt, dHdt] = rate(0, energy(t-1));
         energy(t) = energy(t-1) + (dt * dUdt);
         energy_consumption(t) = energy_consumption(t-1) + (dt * dHdt);
