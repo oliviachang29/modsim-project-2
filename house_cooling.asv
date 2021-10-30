@@ -1,10 +1,12 @@
 function [time_range, temperature, energy_consumption, on_time] = house_cooling(set_temp_range)
-    set_temp_range
 
     %initial conditions
     set_temp = set_temp_range(1);
-    temp_amb = 270;
+    temp_amb = 285;
 
+%     set_temp_c = 20; % C
+%     set_temp = 273 + set_temp_c; % convert to K
+%     temp_amb = 270;
     heater_state = true;
     t_cur = temp_amb;
     
@@ -61,7 +63,7 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
      R_value = R_wall / A_tot
      
      
-     R_attic = 1/A_attic * (attic_fiber_batt_thickness/fiber_batt_k);
+%      R_attic = 1/A_attic * (attic_fiber_batt_thickness/fiber_batt_k);
 %      R_floor = 1/A_floor * (floor_concrete_thickness/concrete_k);
    
     % mass = density * volume
@@ -105,13 +107,12 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     
     %rate function
     function [dUdt, dHdt] = rate(~, U)
-        % calculate current temp
+        %calculate curret temp
         t_cur = energyToTemperature(U, tot_mass, c_weighted);
         
-        %find current heater statues
+        %find curret heater statues
         heater_state = get_heater_state(t_cur, set_temp, heater_state);
-        
-        R_tot = 1 / ( (1/R_attic) + (1/R_wall));
+        R_tot = 1 / ( (1/R_attic) + (1/R_wall);
         
         dHdt = (heater_state * H);
         dUdt = dHdt - ((t_cur - temp_amb) / R_tot);
