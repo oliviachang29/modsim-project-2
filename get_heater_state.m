@@ -1,4 +1,5 @@
 function heater_state = get_heater_state(temp, set_temp, heater_state)
+    global k_to_c hours_to_seconds effective_off_temp;
     buffer = 0.2;
     %thermostat logic
     %if heater is off and house is colder than minimum tolerance...

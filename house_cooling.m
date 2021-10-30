@@ -1,5 +1,5 @@
-function [time_range, temperature, energy_consumption, on_time] = house_cooling(set_temp_range)
-    set_temp_range
+function [time_range, temperature, energy_consumption, on_time] = house_cooling(set_temp_range, initial_house_temp)
+    global k_to_c hours_to_seconds effective_off_temp;
     % set parameters (at some point move this into function arguments)
 %     time_leave = 9; % time you leave the house in hours (military)
 %     time_return = 17; % time you come back
@@ -7,14 +7,19 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     %initial conditions
     set_temp = set_temp_range(1);
     temp_amb = 285;
+    heater_state = true; % heater initially on
 
-    heater_state = true;
-    t_cur = temp_amb;
+    if strcmp(initial_house_temp, 'temp_amb')
+      disp('current_house_temp defaulting to temp_amb')
+      initial_house_temp = temp_amb;
+    end
+
+    current_house_temp = initial_house_temp;
 
     % house paramters
     house_width = 10; % m
     house_length = 15; % m
-    house_height = 3 % m, approx 10 ft
+    house_height = 3; % m, approx 10 ft
 
     % surface areas
     A_wall = 2 * house_width * house_height + 2 * house_length * house_height; %m^2, surface area of attic
@@ -58,7 +63,7 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     % resistance values
     %      R_wall = 1/A_wall * (wall_concrete_thickness / concrete_k);
     R_wall = 1/A_wall * (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k); % Km^2 / W
-    RSI_value = R_wall / A_tot
+    RSI_value = R_wall / A_tot;
 
     R_attic = 1/A_attic * (attic_fiber_batt_thickness/fiber_batt_k);
     %      R_floor = 1/A_floor * (floor_concrete_thickness/concrete_k);
@@ -70,7 +75,7 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     c_weighted = concrete_c * (thermal_mass / tot_mass) + air_c * (air_mass / tot_mass);
     heater_power = 15000; % watts, Heater power
     
-    U_0 = temperatureToEnergy(t_cur, tot_mass, c_weighted)
+    U_0 = temperatureToEnergy(current_house_temp, tot_mass, c_weighted);
     
     %setup for Eulers method
 
@@ -105,17 +110,17 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     %rate function
     function [dUdt, dHdt] = rate(~, U)
         % calculate current temp
-        t_cur = energyToTemperature(U, tot_mass, c_weighted);
+        current_house_temp = energyToTemperature(U, tot_mass, c_weighted);
         
         %find current heater statues
-        heater_state = get_heater_state(t_cur, set_temp, heater_state);
+        heater_state = get_heater_state(current_house_temp, set_temp, heater_state);
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));
 %         R_tot = R_wall;
         
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));
         
         dHdt = (heater_state * heater_power);
-        dUdt = dHdt - ((t_cur - temp_amb) / R_tot);
+        dUdt = dHdt - ((current_house_temp - temp_amb) / R_tot);
         
     end
 end
