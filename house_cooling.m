@@ -1,4 +1,4 @@
-function [time_range, temperature, energy_consumption, on_time] = house_cooling(set_temp_range, initial_house_temp)
+function [time_range, temperature, energy_consumption, on_time, outside_temp] = house_cooling(set_temp_range, initial_house_temp)
     global k_to_c hours_to_seconds effective_off_temp;
     % set parameters (at some point move this into function arguments)
 %     time_leave = 9; % time you leave the house in hours (military)
@@ -87,6 +87,7 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     %make empty array
     energy = zeros(1, length(time_range));
     energy_consumption = zeros(1, length(time_range));
+    outside_temp = zeros(1, length(time_range));
     on_time = 0;
     
     %populate with initial condition
@@ -96,19 +97,28 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     %Eulers method
     for t=2:length(set_temp_range)
         set_temp = set_temp_range(t);
-        [dUdt, dHdt] = rate(0, energy(t-1));
+        time = time_range(t);
+        %evaluate ODE
+        [dUdt, dHdt, temp_amb] = rate(time, energy(t-1));
+        
+        
+        %update stocks
         energy(t) = energy(t-1) + (dt * dUdt);
         energy_consumption(t) = energy_consumption(t-1) + (dt * dHdt);
         if dHdt > 0
             on_time = on_time + dt;
         end
+        
+        %also save temp_amb for plotting
+        outside_temp(t) = temp_amb;
+        
     end
    
     %convert to energy
     temperature = energyToTemperature(energy, tot_mass, c_weighted);
     
     %rate function
-    function [dUdt, dHdt] = rate(~, U)
+    function [dUdt, dHdt, temp_amb] = rate(time, U)
         % calculate current temp
         current_house_temp = energyToTemperature(U, tot_mass, c_weighted);
         
@@ -117,6 +127,8 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));
 %         R_tot = R_wall;
         
+
+        temp_amb = daily_temp_model(time);  %get temp based on model
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));
         
         dHdt = (heater_state * heater_power);

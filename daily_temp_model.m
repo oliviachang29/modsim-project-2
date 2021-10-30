@@ -28,5 +28,5 @@ end
 
 temp = temp_min + (temp_range * (exp(-1 * gamma * t) * ((1 + t / a)^(gamma * a))));
 
-temp = 5/9*(temp - 32); %convert to C
+temp = 5/9*(temp - 32) + 273; %convert to K
 end
