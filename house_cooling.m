@@ -73,7 +73,7 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
     air_mass = air_density * house_width * house_length * house_height;
     tot_mass = air_mass + thermal_mass;
     c_weighted = concrete_c * (thermal_mass / tot_mass) + air_c * (air_mass / tot_mass);
-    heater_power = 15000; % watts, Heater power
+    heater_power = 25000; % watts, Heater power
     
     U_0 = temperatureToEnergy(current_house_temp, tot_mass, c_weighted);
     
@@ -124,9 +124,6 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
         
         %find current heater statues
         heater_state = get_heater_state(current_house_temp, set_temp, heater_state);
-        R_tot = 1 / ( (1/R_attic) + (1/R_wall));
-%         R_tot = R_wall;
-        
 
         temp_amb = daily_temp_model(time);  %get temp based on model
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));

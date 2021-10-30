@@ -12,7 +12,7 @@ function [] = plotDefault(set_temp_range, time_range, temperature, energy_consum
     hold off
     ylim(ylim_temp)
     ylabel("House Temperature (C)")
-    legend("House Temp", "Set Temp", "Outside Temp", "Location", "Southeast")
+    legend("House Temp", "Set Temp", "Outside Temp", "Location", "Northeast")
     
     yyaxis right
     plot(time_range / (hours_to_seconds), energy_consumption / 3.6E6)
