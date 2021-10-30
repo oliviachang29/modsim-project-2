@@ -58,13 +58,16 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
      % Rcond wall 
 %      R_wall = 1/A_wall * (wall_concrete_thickness / concrete_k);
      R_wall = 1/A_wall * (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k); % Km^2 / W
+<<<<<<< HEAD
      R_wall
      A_tot
      R_value = R_wall / A_tot
+=======
+     RSI_value = R_wall / A_tot
+>>>>>>> e019e06 (add attic heat loss)
      
-     
-%      R_attic = 1/A_attic * (attic_fiber_batt_thickness/fiber_batt_k);
-%      R_floor = 1/A_floor * (floor_concrete_thickness/concrete_k);
+     R_attic = 1/A_attic * (attic_fiber_batt_thickness/fiber_batt_k);
+%      R_floor = 1/A_floor * (floor_concrete_thickness/concrete_k); % w
    
     % mass = density * volume
     thermal_mass = concrete_density * house_width * house_length * floor_concrete_thickness;
@@ -76,9 +79,14 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
     U_0 = temperatureToEnergy(t_cur, tot_mass, c_weighted)
     
     %setup for Eulers method
+<<<<<<< HEAD
 
     t_0 = 1;
     t_end = length(set_temp_range);
+=======
+    t_0 = 1;
+    t_end = 60*60*24;
+>>>>>>> e019e06 (add attic heat loss)
     dt = 1;
     time_range = t_0:dt:t_end;
     
@@ -112,7 +120,17 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
         
         %find curret heater statues
         heater_state = get_heater_state(t_cur, set_temp, heater_state);
+<<<<<<< HEAD
         R_tot = 1 / ( (1/R_attic) + (1/R_wall);
+=======
+        R_tot = 1 / ( (1/R_attic) + (1/R_wall));
+%         R_tot = R_wall;
+        
+        %computute conduction R value
+%         R_tot = (d / (A*k));
+        
+        %put it all together
+>>>>>>> e019e06 (add attic heat loss)
         
         dHdt = (heater_state * H);
         dUdt = dHdt - ((t_cur - temp_amb) / R_tot);

@@ -56,10 +56,7 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
      % Rcond wall 
 %      R_wall = 1/A_wall * (wall_concrete_thickness / concrete_k);
      R_wall = 1/A_wall * (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k); % Km^2 / W
-     R_wall
-     A_tot
-     R_value = R_wall / A_tot
-     
+     RSI_value = R_wall / A_tot
      
      R_attic = 1/A_attic * (attic_fiber_batt_thickness/fiber_batt_k);
 %      R_floor = 1/A_floor * (floor_concrete_thickness/concrete_k);
@@ -110,6 +107,11 @@ function [time_range, temperature, energy_consumption, on_time] = house_cooling(
         
         %find current heater statues
         heater_state = get_heater_state(t_cur, set_temp, heater_state);
+        R_tot = 1 / ( (1/R_attic) + (1/R_wall));
+%         R_tot = R_wall;
+        
+        %computute conduction R value
+%         R_tot = (d / (A*k));
         
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));
         
