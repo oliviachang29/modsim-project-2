@@ -93,6 +93,7 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
     %populate with initial condition
     energy(1) = U_0;
     energy_consumption(1) = (1*heater_power*dt);
+    outside_temp(1) = daily_temp_model(1);
     
     %Eulers method
     for t=2:length(set_temp_range)
