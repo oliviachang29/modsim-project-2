@@ -92,7 +92,7 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
     energy = zeros(1, length(time_range));
     energy_consumption = zeros(1, length(time_range));
     outside_temp = zeros(1, length(time_range));
-    on_time = dt;
+    on_time = dt * ;
     
     %populate with initial condition
     energy(1) = U_0;
@@ -111,7 +111,7 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
         energy(t) = energy(t-1) + (dt * dUdt);
         energy_consumption(t) = energy_consumption(t-1) + (dt * dHdt);
         if dHdt > 0
-            on_time = on_time + dt;
+            on_time = on_time + dt * t;
         end
         
         %also save temp_amb for plotting
