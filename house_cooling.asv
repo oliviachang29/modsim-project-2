@@ -70,8 +70,8 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
     
     
     
-    R_attic = (attic_fiber_batt_thickness/fiber_batt_k);
-    R_attic = R_attic * 16 * inches_to_meters / A_attic;  %W/K
+    R_attic = 1/A_attic * (attic_fiber_batt_thickness/fiber_batt_k);
+    R_attic = R_attic * 16 * inches_to_meters / A_wall;  %W/K
    
     
     % mass = density * volume
