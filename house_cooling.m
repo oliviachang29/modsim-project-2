@@ -34,6 +34,8 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
     concrete_k = 1.75; % apparently this is dense
     stucco_k = 0.69;
     air_k = 0.024; % if needed for convection
+    
+    R_conv = 0.15;
 
     % specific heat, J/ kg K
     air_c = 1000;
@@ -62,12 +64,8 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
 
     % resistance values
     %      R_wall = 1/A_wall * (wall_concrete_thickness / concrete_k);
-    R_wall = (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k) + 0.15; % Km^2 / W
+    R_wall = (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k) + R_conv; % Km^2 / W
     R_wall = R_wall * 11.5 * inches_to_meters / A_wall;  %W/K
-    
-    
-    
-    
     
     
     R_attic = (attic_fiber_batt_thickness/fiber_batt_k);
