@@ -1,5 +1,5 @@
 function [] = plotDefault(set_temp_range, time_range, temperature, energy_consumption, outside_temp, graph_title, ylim_temp)
-    global k_to_c hours_to_seconds effective_off_temp;
+    global k_to_c hours_to_seconds effective_off_temp ideal_temp freezing_temp heater_power;
     figure(1)
     clf
     title(graph_title)

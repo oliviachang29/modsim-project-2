@@ -1,8 +1,5 @@
 function [time_range, temperature, energy_consumption, on_time, outside_temp] = house_cooling(set_temp_range, initial_house_temp)
-    global k_to_c hours_to_seconds effective_off_temp;
-    % set parameters (at some point move this into function arguments)
-%     time_leave = 9; % time you leave the house in hours (military)
-%     time_return = 17; % time you come back
+    global k_to_c hours_to_seconds effective_off_temp ideal_temp freezing_temp;
 
     %initial conditions
     set_temp = set_temp_range(1);
@@ -55,6 +52,8 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
     wall_fiber_batt_thickness = 2 * inches_to_meters; 
     wall_concrete_thickness = 8 * inches_to_meters;
     wall_stucco_thickness = 1 * inches_to_meters;
+    
+    heater_power = 25000; % watts, Heater power
 
     % ATTIC (ROOF)
     attic_fiber_batt_thickness = 16 * inches_to_meters; %m, thickness of attic
@@ -64,9 +63,9 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
 
     % resistance values
     %      R_wall = 1/A_wall * (wall_concrete_thickness / concrete_k);
+
     R_wall = (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k) + R_conv; % Km^2 / W
     R_wall = R_wall * 11.5 * inches_to_meters / A_wall;  %W/K
-    
     
     R_attic = (attic_fiber_batt_thickness/fiber_batt_k);
     R_attic = R_attic * 16 * inches_to_meters / A_attic;  %W/K
@@ -77,7 +76,9 @@ function [time_range, temperature, energy_consumption, on_time, outside_temp] = 
     air_mass = air_density * house_width * house_length * house_height;
     tot_mass = air_mass + thermal_mass;
     c_weighted = concrete_c * (thermal_mass / tot_mass) + air_c * (air_mass / tot_mass);
-    heater_power = 30000; % watts, Heater power
+    
+    heater_power = 25000; % watts, Heater power
+
     
     U_0 = temperatureToEnergy(current_house_temp, tot_mass, c_weighted);
     
