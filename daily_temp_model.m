@@ -11,8 +11,8 @@ t = t - t_offset;
 
 gamma = 0.5/hours_to_seconds;
 
-temp_min = 20;  %minimum temp
-temp_range = 15;  %maximum temp from range
+temp_min = 21.2;  %minimum temp
+temp_range = 14.4;  %maximum temp from range
 
 a = 7.2 * hours_to_seconds;
 
