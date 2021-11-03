@@ -77,7 +77,7 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     %initial conditions
     current_house_temp = initial_house_temp;
     U_0 = temperatureToEnergy(current_house_temp, tot_mass, c_weighted);
-    heater_state = false; % heater initially on
+    heater_state = true; % heater initially on
   
     %setup for Eulers method
     dt = set_temp_range(1,2) - set_temp_range(1,1);
