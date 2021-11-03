@@ -1,5 +1,5 @@
 function [time_range, temperature, energy_consumption, on_time, outside_temp] = house_cooling(set_temp_range, initial_house_temp)
-    global k_to_c hours_to_seconds effective_off_temp ideal_temp freezing_temp;
+    global k_to_c hours_to_seconds effective_off_temp ideal_temp freezing_temp heater_power;
 
     %initial conditions
     set_temp = set_temp_range(1);
