@@ -18,7 +18,7 @@ function [energy_consumed_from_leave_to_normal_temp,time_house_returns_to_normal
     for j=1:size(X_time_after_return,1)
         if X_time_after_return(j,2) >= ideal_temp
             energy_consumption_when_house_returns_to_normal_temp = X_time_after_return(j,3);
-            time_house_returns_to_normal_temp = time_after_return + j;
+            time_house_returns_to_normal_temp = time_after_return*hours_to_seconds + j;
             break
         end
     end
