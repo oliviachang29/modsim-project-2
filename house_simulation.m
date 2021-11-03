@@ -21,7 +21,8 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     stucco_k = 0.69;
     air_k = 0.024; % if needed for convection
 
-    R_conv = 0.15;
+    R_conv = 0.15; %this is the term used by the DOE to include the effects of convection when computing conduction through a wall
+    %it is just added on to resistivity value for the walls.
 
     % specific heat, J/ kg K
     air_c = 1000;
@@ -42,8 +43,6 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     wall_concrete_thickness = 8 * inches_to_meters;
     wall_stucco_thickness = 1 * inches_to_meters;
 
-    %heater_power = 30000; % watts, Heater power
-
     % ATTIC (ROOF)
     attic_fiber_batt_thickness = 16 * inches_to_meters; %m, thickness of attic
 
@@ -51,15 +50,15 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     floor_concrete_thickness = 4 * inches_to_meters; %m, thickness of floor
 
     % resistance values
-    %      R_wall = 1/A_wall * (wall_concrete_thickness / concrete_k);
 
+    %compute thermal resitance for walls and roof
     R_wall = (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k) + R_conv; % Km^2 / W
     R_wall = R_wall * 11.5 * inches_to_meters / A_wall;  %W/K
 
     R_attic = (attic_fiber_batt_thickness/fiber_batt_k);
     R_attic = R_attic * 16 * inches_to_meters / A_attic;  %W/K
 
-
+    %compute mass and wigheted specific heat
     % mass = density * volume
     thermal_mass = concrete_density * house_width * house_length * floor_concrete_thickness;
     air_mass = air_density * house_width * house_length * house_height;
@@ -121,13 +120,9 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     function [dUdt, dHdt, temp_amb] = rate(time, U)
         % calculate current temp
         current_house_temp = energyToTemperature(U, tot_mass, c_weighted);
-        
         %find current heater statues
-        
         heater_state = get_heater_state(current_house_temp, set_temp, heater_state);
-
         temp_amb = daily_temp_model(time);  %get temp based on model
-        
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));
         
         dHdt = (heater_state * heater_power);
