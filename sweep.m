@@ -1,5 +1,6 @@
 
 global hours_to_seconds effective_off_temp ideal_temp down_temp;
+house_temp_0 = 22 + 273;
 
 %make matrix to save meaningfull data
 energy = zeros(3, length(sweep_range));
@@ -19,7 +20,7 @@ for i = 1:length(sweep_range)
     temp_range(1:1+away_from_home*hours_to_seconds/dt) = down_temp;
     temp_range(1+away_from_home*hours_to_seconds/dt:end) = ideal_temp;
     evaluation_matrix = [time_range ; temp_range];
-    [~, energy_consumption, ~, ~] = house_simulation(evaluation_matrix, ideal_temp);
+    [~, energy_consumption, ~, ~] = house_simulation(evaluation_matrix, house_temp_0);
     energy(2,i) = max(energy_consumption);
     
     
