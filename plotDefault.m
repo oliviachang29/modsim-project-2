@@ -2,6 +2,7 @@ function [] = plotDefault(set_temp_range, time_range, temperature, energy_consum
     global k_to_c hours_to_seconds effective_off_temp ideal_temp freezing_temp heater_power;
     figure(1)
     clf
+    set (figure(1), "Position", [0 0 700 600])
     title(graph_title)
     xlabel("Time (hours)")
     yyaxis left
