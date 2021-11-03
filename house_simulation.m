@@ -1,19 +1,8 @@
 function [temperature, energy_consumption, on_time, outside_temp] = house_simulation(set_temp_range, initial_house_temp)
-    global k_to_c hours_to_seconds effective_off_temp ideal_temp freezing_temp;
-
-    %initial conditions
-    set_temp = set_temp_range(2,1);
-    temp_amb = 285;
-    heater_state = true; % heater initially on
-
-    if strcmp(initial_house_temp, 'temp_amb')
-      disp('current_house_temp defaulting to temp_amb')
-      initial_house_temp = temp_amb;
-    end
-
-    current_house_temp = initial_house_temp;
-
-    % house paramters
+    global k_to_c hours_to_seconds effective_off_temp ideal_temp freezing_temp heater_power;
+    
+    %======================================================================
+    %=============================Define house parameters =================
     house_width = 10; % m
     house_length = 15; % m
     house_height = 3; % m, approx 10 ft
@@ -31,7 +20,7 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     concrete_k = 1.75; % apparently this is dense
     stucco_k = 0.69;
     air_k = 0.024; % if needed for convection
-    
+
     R_conv = 0.15;
 
     % specific heat, J/ kg K
@@ -52,7 +41,7 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     wall_fiber_batt_thickness = 2 * inches_to_meters; 
     wall_concrete_thickness = 8 * inches_to_meters;
     wall_stucco_thickness = 1 * inches_to_meters;
-    
+
     %heater_power = 30000; % watts, Heater power
 
     % ATTIC (ROOF)
@@ -66,22 +55,30 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
 
     R_wall = (wall_gipsum_thickness/gipsum_k + wall_fiber_batt_thickness/fiber_batt_k + wall_concrete_thickness / concrete_k + wall_stucco_thickness/stucco_k) + R_conv; % Km^2 / W
     R_wall = R_wall * 11.5 * inches_to_meters / A_wall;  %W/K
-    
+
     R_attic = (attic_fiber_batt_thickness/fiber_batt_k);
     R_attic = R_attic * 16 * inches_to_meters / A_attic;  %W/K
-   
-    
+
+
     % mass = density * volume
     thermal_mass = concrete_density * house_width * house_length * floor_concrete_thickness;
     air_mass = air_density * house_width * house_length * house_height;
     tot_mass = air_mass + thermal_mass;
     c_weighted = concrete_c * (thermal_mass / tot_mass) + air_c * (air_mass / tot_mass);
     
-    %heater_power = 25000; % watts, Heater power
-
     
+    
+    
+    %======================================================================
+    %=============================Start of important stuff=================
+    
+    
+    
+    %initial conditions
+    current_house_temp = initial_house_temp;
     U_0 = temperatureToEnergy(current_house_temp, tot_mass, c_weighted);
-    
+    heater_state = false; % heater initially on
+  
     %setup for Eulers method
     dt = set_temp_range(1,2) - set_temp_range(1,1);
  
@@ -93,27 +90,28 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
     
     %populate with initial condition
     energy(1) = U_0;
-    energy_consumption(1) = (1*heater_power*dt);
+    energy_consumption(1) = (heater_state*heater_power*dt);
     outside_temp(1) = daily_temp_model(set_temp_range(2,1));
     
     %Eulers method
     for t=2:length(set_temp_range(1,:))
-        set_temp = set_temp_range(2,t);
+        
         time = set_temp_range(1,t);
+        set_temp = set_temp_range(2,t);
+        
         %evaluate ODE
         [dUdt, dHdt, temp_amb] = rate(time, energy(t-1));
-        
         
         %update stocks
         energy(t) = energy(t-1) + (dt * dUdt);
         energy_consumption(t) = energy_consumption(t-1) + (dt * dHdt);
+        
         if dHdt > 0
             on_time = on_time + dt;
         end
         
         %also save temp_amb for plotting
         outside_temp(t) = temp_amb;
-        
     end
    
     %convert to energy
@@ -125,9 +123,11 @@ function [temperature, energy_consumption, on_time, outside_temp] = house_simula
         current_house_temp = energyToTemperature(U, tot_mass, c_weighted);
         
         %find current heater statues
+        
         heater_state = get_heater_state(current_house_temp, set_temp, heater_state);
 
         temp_amb = daily_temp_model(time);  %get temp based on model
+        
         R_tot = 1 / ( (1/R_attic) + (1/R_wall));
         
         dHdt = (heater_state * heater_power);

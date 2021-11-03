@@ -1,7 +1,0 @@
-figure(1)
-clf
-hold on
-for i=1:3
-    plot(sweep_range + 4, energy(i,:)/36000)
-end
-legend("Off", "Down", "On")
